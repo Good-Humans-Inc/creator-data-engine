@@ -16,6 +16,7 @@ from src.notion_integration import NotionIntegration, format_database_id
 from src.view_scraper_selenium import ViewScraperSelenium
 from src.utils import SettlementCalculator, DataStorage, format_number
 from src.i18n import get_text, LANGUAGE_OPTIONS, translate_ugc_type
+import src.ui as ui
 import pandas as pd
 from datetime import datetime
 import traceback
@@ -43,11 +44,16 @@ if 'debug_logs' not in st.session_state:
 def main():
     """主函数"""
 
+    # 应用自定义UI样式
+    ui.apply_custom_style()
+
     # 获取当前语言
     lang = st.session_state.language
 
     # 侧边栏 - 语言选择和配置
     with st.sidebar:
+        # 显示Logo
+        ui.display_sidebar_logo()
         # 语言选择器（放在最顶部）
         st.subheader("🌐 " + get_text("language", lang))
         selected_lang = st.selectbox(

@@ -30,6 +30,14 @@ class ViewScraperSelenium:
         self.headless = headless
         self.driver = None
 
+    def _safe_print(self, message: str):
+        """安全的 print 函数（避免 Broken pipe 错误）"""
+        try:
+            print(message)
+        except (BrokenPipeError, IOError):
+            # 忽略 print 错误（Streamlit 环境下可能发生）
+            pass
+
     def _init_driver(self):
         """初始化Chrome驱动"""
         if self.driver is None:
@@ -66,7 +74,7 @@ class ViewScraperSelenium:
     def scrape_instagram_views(self, url: str) -> Optional[int]:
         """从Instagram爬取播放量"""
         try:
-            print(f"[Instagram] 开始爬取: {url}")
+            self._safe_print(f"[Instagram] 开始爬取: {url}")
 
             self._init_driver()
             self.driver.get(url)
@@ -92,23 +100,23 @@ class ViewScraperSelenium:
                         views_str = matches[0]
                         views = self._parse_views_number(views_str)
                         if views and views > 0:
-                            print(f"[Instagram] ✓ 成功: {views:,} views")
+                            self._safe_print(f"[Instagram] ✓ 成功: {views:,} views")
                             return views
 
             except Exception as e:
-                print(f"[Instagram] 查找失败: {str(e)}")
+                self._safe_print(f"[Instagram] 查找失败: {str(e)}")
 
-            print(f"[Instagram] ✗ 未找到播放量数据")
+            self._safe_print(f"[Instagram] ✗ 未找到播放量数据")
             return None
 
         except Exception as e:
-            print(f"[Instagram] ✗ 错误: {str(e)}")
+            self._safe_print(f"[Instagram] ✗ 错误: {str(e)}")
             return None
 
     def scrape_tiktok_views(self, url: str) -> Optional[int]:
         """从TikTok爬取播放量"""
         try:
-            print(f"[TikTok] 开始爬取: {url}")
+            self._safe_print(f"[TikTok] 开始爬取: {url}")
 
             self._init_driver()
             self.driver.get(url)
@@ -133,17 +141,17 @@ class ViewScraperSelenium:
                         views_str = matches[0]
                         views = self._parse_views_number(views_str)
                         if views and views > 0:
-                            print(f"[TikTok] ✓ 成功: {views:,} views")
+                            self._safe_print(f"[TikTok] ✓ 成功: {views:,} views")
                             return views
 
             except Exception as e:
-                print(f"[TikTok] 查找失败: {str(e)}")
+                self._safe_print(f"[TikTok] 查找失败: {str(e)}")
 
-            print(f"[TikTok] ✗ 未找到播放量数据")
+            self._safe_print(f"[TikTok] ✗ 未找到播放量数据")
             return None
 
         except Exception as e:
-            print(f"[TikTok] ✗ 错误: {str(e)}")
+            self._safe_print(f"[TikTok] ✗ 错误: {str(e)}")
             return None
 
     def _parse_views_number(self, views_str: str) -> Optional[int]:
@@ -187,7 +195,7 @@ class ViewScraperSelenium:
         elif platform == 'tiktok':
             views = self.scrape_tiktok_views(url)
         else:
-            print(f"[Unknown] 不支持的平台: {url}")
+            self._safe_print(f"[Unknown] 不支持的平台: {url}")
             return None
 
         # 延迟

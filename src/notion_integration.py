@@ -40,7 +40,11 @@ class NotionIntegration:
     def add_debug(self, message: str):
         """添加调试信息"""
         self.debug_info.append(message)
-        print(f"[DEBUG] {message}")
+        try:
+            print(f"[DEBUG] {message}")
+        except (BrokenPipeError, IOError):
+            # 忽略 print 错误（Streamlit 环境下 stdout 可能被关闭）
+            pass
 
     def get_database_structure(self, database_id: str) -> Dict:
         """
